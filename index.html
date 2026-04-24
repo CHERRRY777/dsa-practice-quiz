@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Quiz Master</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <main class="glass-container" style="position: relative;">
+        <!-- Start Screen -->
+        <section id="start-screen" class="screen active">
+            <div class="header">
+                <h1>DSA <span>Quiz Master</span></h1>
+                <p>Test your Data Structures & Algorithms knowledge.</p>
+            </div>
+            <form id="start-form">
+                <div class="input-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" required placeholder="Enter your name">
+                </div>
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="Enter your email address">
+                </div>
+                <button type="submit" class="btn primary-btn">Start Quiz</button>
+                <button type="button" id="leaderboard-btn" class="btn secondary-btn" style="margin-top: 1rem; width: 100%;">View Leaderboard</button>
+            </form>
+        </section>
+
+        <!-- Leaderboard Screen -->
+        <section id="leaderboard-screen" class="screen hidden">
+            <div class="header">
+                <h2>Top <span>Performers</span></h2>
+                <p>The highest scorers taking the quiz.</p>
+            </div>
+            
+            <div id="winners-announcement" class="hidden" style="margin-bottom: 1.5rem; background: rgba(16, 185, 129, 0.2); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--success);">
+                <h3 style="color: var(--success); text-align: center; margin-bottom: 1rem;">🏆 Official Winners 🏆</h3>
+                <div id="winners-list"></div>
+            </div>
+
+            <div class="leaderboard-container">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1rem; justify-content: space-between;">
+                <button id="back-to-home-btn" class="btn secondary-btn" style="flex: 1;">Back to Home</button>
+                <button id="claim-prize-btn" class="btn primary-btn hidden" style="flex: 1; background: #f59e0b;">Claim Prize!</button>
+                <button id="finalize-winners-btn" class="btn primary-btn" style="flex: 1; background: var(--success);">Finalize Winners</button>
+            </div>
+        </section>
+
+        <!-- Payout Screen -->
+        <section id="payout-screen" class="screen hidden">
+            <div class="header">
+                <h2>Claim <span>Prize</span></h2>
+                <p>Congratulations! Enter your payout details below.</p>
+            </div>
+            <form id="payout-form">
+                <div class="input-group">
+                    <label for="payout-name">Full Name as per Bank</label>
+                    <input type="text" id="payout-name" required placeholder="Enter your registered bank name">
+                </div>
+                <div class="input-group">
+                    <label for="payout-upi">UPI ID</label>
+                    <input type="text" id="payout-upi" required placeholder="example: user@okhdfcbank">
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="button" id="cancel-payout-btn" class="btn secondary-btn" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn primary-btn" style="flex: 1; background: var(--success);">Confirm Claim</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Quiz Screen -->
+        <section id="quiz-screen" class="screen hidden">
+            <div class="quiz-header">
+                <div class="user-info">
+                    <span id="display-name">User</span>
+                </div>
+                <div class="timer-container">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span id="time-left">10:00</span>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+
+            <div id="question-container" class="question-container"></div>
+
+            <div class="quiz-footer">
+                <button id="prev-btn" class="btn secondary-btn" disabled>Previous</button>
+                <button id="next-btn" class="btn secondary-btn">Next</button>
+                <button id="submit-btn" class="btn primary-btn hidden">Submit Quiz</button>
+            </div>
+        </section>
+
+        <!-- Result Screen -->
+        <section id="result-screen" class="screen hidden">
+            <div class="result-header">
+                <h2>Quiz Completed!</h2>
+                <p id="result-message">Great job, here are your results.</p>
+            </div>
+            <div class="score-circle">
+                <div class="score-text">
+                    <span id="score-value">0</span>
+                    <span class="total">/ <span id="total-value">0</span></span>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat-box">
+                    <span>Accuracy</span>
+                    <strong id="accuracy-value">0%</strong>
+                </div>
+            </div>
+            <button id="restart-btn" class="btn primary-btn">Return to Home</button>
+        </section>
+        
+        <!-- Admin Screen -->
+        <section id="admin-screen" class="screen hidden" style="position: absolute; top:0; left:0; right:0; bottom:0; background: var(--glass-bg); z-index: 100; border-radius: 24px; padding: 2rem;">
+            <div class="header">
+                <h2>Admin <span>Dashboard</span></h2>
+                <p>Manage Users, Payouts, and Configs</p>
+            </div>
+            <div id="admin-login">
+                <div class="input-group">
+                    <input type="password" id="admin-token" placeholder="Enter strictly authorized Admin Token">
+                </div>
+                <button id="admin-login-btn" class="btn primary-btn">Login</button>
+                <button id="admin-close-btn" class="btn secondary-btn" style="margin-top:1rem;">Close Server Admin</button>
+            </div>
+            
+            <div id="admin-panel" class="hidden">
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <button id="admin-tab-users" class="btn secondary-btn" style="flex:1; padding: 0.5rem; font-size: 0.9rem;">Views</button>
+                    <button id="admin-tab-action" class="btn primary-btn" style="flex:1; padding: 0.5rem; font-size: 0.9rem;">Payouts</button>
+                </div>
+                
+                <div id="admin-view-data" class="hidden" style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 8px; max-height: 250px; overflow-y: auto; font-size: 0.8rem; text-align: left; font-family: monospace;">
+                    <h4 style="color:var(--primary); margin-bottom: 0.2rem;">► Registered Users</h4>
+                    <div id="admin-users-list" style="margin-bottom: 1rem; padding-left: 0.5rem;">Loading...</div>
+                    
+                    <h4 style="color:var(--primary); margin-bottom: 0.2rem;">► Payment Transactions</h4>
+                    <div id="admin-payments-list" style="margin-bottom: 1rem; padding-left: 0.5rem;">Loading...</div>
+                    
+                    <h4 style="color:var(--primary); margin-bottom: 0.2rem;">► Active Winners / UPIs</h4>
+                    <div id="admin-winners-list" style="padding-left: 0.5rem;">Loading...</div>
+                </div>
+
+                <div id="admin-view-action">
+                    <h3 style="margin-bottom: 1rem; font-size: 1rem;">Action Control Center</h3>
+                    <button id="trigger-payouts-btn" class="btn primary-btn" style="background: var(--success); margin-bottom: 1rem;">Trigger Live Razorpay Payouts</button>
+                    <div id="payout-results" style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 8px; min-height: 120px; max-height: 150px; font-size: 0.85rem; overflow-y: auto; text-align: left; font-family: monospace;">
+                        > Logs stand by...
+                    </div>
+                </div>
+                
+                <button id="admin-exit-btn" class="btn secondary-btn" style="margin-top: 1.5rem;">Terminate Session</button>
+            </div>
+        </section>
+        
+    </main>
+
+    <div style="text-align: center; margin-top: 1.5rem; position: relative; z-index: 10;">
+        <span id="admin-trigger" style="color: var(--text-muted); cursor: pointer; font-size: 0.8rem; text-decoration: underline;">Administrator Access</span>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
